@@ -25,8 +25,8 @@ PredictLabel = 'AskP0'
 shift = 3
 
 # 初始化
-Tick0 = pd.HDFStore('../data/TickData600519','r')           #读入Tick数据
-Tran0 = pd.HDFStore('../data/TransactionData600519','r')    #读入Tran数据
+Tick0 = pd.HDFStore('data/TickData600519','r')           #读入Tick数据
+Tran0 = pd.HDFStore('data/TransactionData600519','r')    #读入Tran数据
 date = Tick0.keys()                                     #日期List
 cnt = 0                                                 #日期统计
 day_cnt = []                                            #每个日期的数据
