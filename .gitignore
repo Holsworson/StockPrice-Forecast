@@ -3,3 +3,5 @@ data/*
 # 数据
 *.csv
 *.xls
+# notebook
+Jupiter_notebook/*
