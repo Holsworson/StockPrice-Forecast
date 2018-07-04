@@ -121,14 +121,29 @@ class TranFeature(object):
                 ({"Price":[np.min,np.max,np.median,np.size]})
         temp.columns = ['LowPrice','HighPrice','MedianPrice','CountPrice']
         
-        temp['MedianBid'] = self.Tran.loc[self.Tran.BSFlags=="B",['Timestamp',\
-                'Price']].groupby('Timestamp').median()
-        temp['MedianAsk'] = self.Tran.loc[self.Tran.BSFlags=="S",['Timestamp',\
-                'Price']].groupby('Timestamp').median()
+#        temp['MedianBid'] = self.Tran.loc[self.Tran.BSFlags=="B",['Timestamp',\
+#                'Price']].groupby('Timestamp').median()
+#        temp['MedianAsk'] = self.Tran.loc[self.Tran.BSFlags=="S",['Timestamp',\
+#                'Price']].groupby('Timestamp').median()
+#        temp['CountBid'] = self.Tran.loc[self.Tran.BSFlags=="B",['Timestamp',\
+#                'Volume']].groupby('Timestamp').size()
+#        temp['CountAsk'] = self.Tran.loc[self.Tran.BSFlags=="S",['Timestamp',\
+#                'Volume']].groupby('Timestamp').size()
+
         temp['CountBid'] = self.Tran.loc[self.Tran.BSFlags=="B",['Timestamp',\
-                'Volume']].groupby('Timestamp').size()
+                'Volume']].groupby('Timestamp').sum()
         temp['CountAsk'] = self.Tran.loc[self.Tran.BSFlags=="S",['Timestamp',\
-                'Volume']].groupby('Timestamp').size()
+                'Volume']].groupby('Timestamp').sum()
+        def MedianV_price(x):
+            _ = []
+            for i in x.index:
+                _ += [x.loc[i,'Price']] * int(x.loc[i,'Volume']/100)
+            return pd.Series(_).median()
+        temp['MedianBid'] = self.Tran.loc[self.Tran.BSFlags=="B",\
+            ['Timestamp','Price','Volume']].groupby('Timestamp').apply(MedianV_price)
+        temp['MedianAsk'] = self.Tran.loc[self.Tran.BSFlags=="S",\
+            ['Timestamp','Price','Volume']].groupby('Timestamp').apply(MedianV_price)
+        
         # temp的index 是Timestamp --> 提出Timestamp 和 Tick merge
         temp = temp.reset_index().rename(columns={'index':'Timestamp'})
         self.Tick = pd.merge(self.Tick,temp,on=['Timestamp'],how='left')
@@ -143,6 +158,9 @@ class TranFeature(object):
         self.Tick.loc[nullAsk,'MedianAsk'] = self.Tick.loc[nullAsk,'Price']
         self.Tick['CountBid'] = self.Tick['CountBid'].fillna(0)
         self.Tick['CountAsk'] = self.Tick['CountAsk'].fillna(0)
+        self.Tick['CountBid'] = self.Tick['CountBid'].apply(lambda x:int(x/100))
+        self.Tick['CountAsk'] = self.Tick['CountAsk'].apply(lambda x:int(x/100))
+        
         return self.Tick
     
     def _Tran_energy(self):
