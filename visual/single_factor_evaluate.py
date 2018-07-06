@@ -145,7 +145,7 @@ accuracy_PJ4 = 0
 accuracy_PT6 = 0
 accuracy_PT6_weight = 0
 cnt = 0
-for i in range(len(date_now))[-7:-6]:
+for i in range(len(date_now))[-7:-5]:
     print ("日期:%s"%(date_now[i]))
     tempTick = Tick0[date_now[i]].reset_index().rename(columns={"index":"Timestamp"})
     tempTick['median_5'] = (tempTick['AskP0'].rolling(window=5).median()).shift(-2).fillna(method='pad')
